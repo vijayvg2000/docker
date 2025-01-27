@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: picco23$
+      MYSQL_DATABASE: docker1
+      MYSQL_USER: picco
+      MYSQL_PASSWORD: picco123$
+    ports:
+      - "3306:3306"  # Exposes MySQL port on the host
+    volumes:
+      - mysql_data:/var/lib/mysql  # Persists MySQL data
+    networks:
+      - app-network
+~
+  backend:
+    build: ./backend
+    container_name: backend
+    environment:
+      DB_HOST: mysql            # MySQL service name (mysql)
+      DB_USER: user
+      DB_PASSWORD: userpassword
+      DB_NAME: mydatabase
+    ports:
+      - "3000:3000"  # Exposes your backend app to port 3000 on the host
+    networks:
+      - app-network
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Ensure Nginx is correctly configured
+    ports:
+      - "8082:80"  # Maps port 80 of Nginx container to 8082 on the host
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: always
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
