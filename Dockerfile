@@ -1,8 +1,20 @@
-# Use the official Nginx image from Docker Hub
-FROM nginx:latest
+# backend/Dockerfile
 
-# Copy the custom nginx.conf file into the container
-# COPY config/nginx.conf /etc/nginx/nginx.conf
+# Use the official Node.js image
+FROM node:18
 
-# Expose port 80
-EXPOSE 8082
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the package.json and install dependencies
+COPY package.json ./
+RUN npm install
+
+# Copy the rest of the application
+COPY . .
+
+# Expose port 3000 for the backend
+EXPOSE 3000
+
+# Start the backend server
+CMD npm start serve
